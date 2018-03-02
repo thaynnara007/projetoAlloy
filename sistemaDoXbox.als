@@ -2,9 +2,7 @@ module sistemaDoXbox
 
 sig Usuario{
 
-	acoes : set Acao,
 	videoGame : one Xbox
-
 }
 sig Xbox{
 	
@@ -15,26 +13,29 @@ sig Xbox{
 
 one sig MeusJogosApps{
 	
-	jogos : set Jogo,
+	jogos : set JogoComprado,
 	apps : set Aplicativo 
 }
 one sig Social{
 		
-	publicacoes : set Publicacao
+	publicacoes : some Publicacao
 }
 one sig Loja{
 
-	jogos : some JogoPromocao
+	jogos : some JogoPromocao,
+	apps : some Aplicativo
 }
-sig Jogo{}
+abstract sig Jogo{}
 sig JogoComprado extends Jogo{}
-sig JogoInstalado in JogoComprado{}
-sig JogoPromocao extends Jogo{}
+sig JogoPromocao extends Jogo{
+	
+	comprado : one Comprar
+}
 sig Aplicativo{}
 abstract sig Publicacao{
 
-	curtidas : set Curtida, 
-	compartilhamentos : set Compartilhamento
+	curtidas : one Curtida, 
+	compartilhamentos : one Compartilhamento
 }
 sig Screenshot extends Publicacao{}
 sig Video extends Publicacao{}
@@ -42,15 +43,24 @@ sig Streaming extends Publicacao{
 
 	comentarios : set Comentario
 }
-abstract sig Acao{}
-sig Curtida extends Acao{}
-sig Comentario extends Acao{}
-sig Compartilhamento extends Acao{}
+sig Curtida {}
+sig Comentario {}
+sig Compartilhamento {} 
+sig Comprar{}
 
 fact mult{
+-- 
 	all m:MeusJogosApps | one m.~jogosEApps
 	all s:Social | one s.~social
 	all l:Loja |  one l.~loja
+	all jogo:JogoPromocao | one jogo.~jogos
+	all jogo:JogoComprado |one jogo.~jogos
+	all compra:Comprar | one compra.~comprado
+	all publicacao:Publicacao | one publicacao.~publicacoes
+	all comentario:Comentario | one comentario.~comentarios
+	all curtida:Curtida | one curtida.~curtidas
+	all compartilhamento : Compartilhamento | one compartilhamento.~compartilhamentos
+	
 }
 fact jogosEAppsMaximosNoXbox{
 	all pagina:MeusJogosApps | jogosMaximo[pagina] and appsMaximo[pagina]
@@ -58,13 +68,18 @@ fact jogosEAppsMaximosNoXbox{
 fact usuarioNaoPodeComprarUmJogoQueJaTenha{
 	all usuario: Usuario, loja : Loja | not jogosDoUsuario[usuario] in jogosDaLoja[loja]
 }
-
+fact sobreLoja{
+	all loja: Loja | jogosPossiveisNaLoja[loja]
+}
 pred jogosMaximo[pagina : MeusJogosApps]{
-	#(pagina.jogos) <= 5
+	#jogosDaPagina[pagina] <= 5
 }
 
 pred appsMaximo[pagina : MeusJogosApps]{
-	#(pagina.apps) <= 8
+	#appsDaPagina[pagina] <= 8
+}
+pred jogosPossiveisNaLoja[loja : Loja]{
+	#jogosDaLoja[loja]>= 10 and #jogosDaLoja[loja] <= 20
 }
 
 fun jogosDoUsuario[usuario : Usuario] : set Jogo{
@@ -74,23 +89,16 @@ fun jogosDoUsuario[usuario : Usuario] : set Jogo{
 fun jogosDaLoja[loja : Loja] : set Jogo{
 	loja.jogos
 }
-
-fun ehStreaming[social : Social] : set Publicacao{
-	social.publicacoes & Streaming
+fun jogosDaPagina[pagina:MeusJogosApps] : set Jogo{
+	pagina.jogos
 }
-
-fun ehVideo[social : Social] : set Publicacao{
-	social.publicacoes & Video
-}
-
-fun ehSreenshot[social : Social] : set Publicacao{
-	social.publicacoes & Screenshot
-												
+fun appsDaPagina[pagina:MeusJogosApps] : set Aplicativo{
+	pagina.apps
 }
 
 
 pred show[]{}
-run show for 3
+run show for 13
 
 
 
