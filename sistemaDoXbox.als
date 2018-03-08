@@ -42,13 +42,11 @@ one sig MeusJogosApps{
 
 one sig Social{
 		
-	publicacoes : some Publicacao
-
+	publicacoes : some Publicacao,
 }
 one sig Loja{
 
 	jogos : some JogoPromocao,
-	apps : some Aplicativo
 
 }
 
@@ -203,7 +201,7 @@ assert  testJogosMaximo{
 
 }
 
-check  testJogosMaximo for 15
+--check  testJogosMaximo for 15
 
 assert testAppsMaximo{
 
@@ -211,7 +209,7 @@ assert testAppsMaximo{
 
 }
 
-check testAppsMaximo for 15
+--check testAppsMaximo for 15
 
 assert testJogosPossiveisNaLoja{
 
@@ -219,7 +217,7 @@ assert testJogosPossiveisNaLoja{
 
 }
 
-check  testJogosPossiveisNaLoja for 15 
+--check  testJogosPossiveisNaLoja for 15 
 
 
 ----------------
