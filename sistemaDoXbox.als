@@ -42,7 +42,7 @@ one sig MeusJogosApps{
 
 one sig Social{
 		
-	publicacoes : some Publicacao,
+	publicacoes : set Publicacao,
 }
 one sig Loja{
 
